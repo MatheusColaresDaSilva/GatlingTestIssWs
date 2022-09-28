@@ -3,13 +3,18 @@ package com.gatling.test
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
-import scala.util.Random
+class ParallelTenantSeveralRpsWithMoreThanOneInTheListOneByOneWithOneUser extends Simulation {
 
-class SeveralRpsWithMoreThanOneInTheListOneByOneWithOneUser extends Simulation {
-
-	val httpProtocol = http
+	val httpProtocolMandaguari = http
 		.baseUrl("https://mandaguari.qa.elotech.com.br")
-		//.baseUrl("http://mandaguari.localhost:8089")//LOCAL
+		.inferHtmlResources(BlackList(""".*\.js""", """.*\.css""", """.*\.gif""", """.*\.jpeg""", """.*\.jpg""", """.*\.ico""", """.*\.woff""", """.*\.woff2""", """.*\.(t|o)tf""", """.*\.png""", """.*detectportal\.firefox\.com.*"""), WhiteList())
+		.acceptHeader("text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
+		.acceptEncodingHeader("gzip,deflate")
+		.contentTypeHeader("text/xml;charset=UTF-8")
+		.userAgentHeader("Apache-HttpClient/4.5.5 (Java/16.0.1)")
+
+	val httpProtocolPontaGrossa = http
+		.baseUrl("https://pontagrossa.qa.elotech.com.br")
 		.inferHtmlResources(BlackList(""".*\.js""", """.*\.css""", """.*\.gif""", """.*\.jpeg""", """.*\.jpg""", """.*\.ico""", """.*\.woff""", """.*\.woff2""", """.*\.(t|o)tf""", """.*\.png""", """.*detectportal\.firefox\.com.*"""), WhiteList())
 		.acceptHeader("text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2")
 		.acceptEncodingHeader("gzip,deflate")
@@ -64,15 +69,25 @@ class SeveralRpsWithMoreThanOneInTheListOneByOneWithOneUser extends Simulation {
 	}
 	)
 
-	val scn = scenario("UserPerMinuteSendingRps")
+	val scnMandaguari = scenario("MANDAGUARI_UserPerMinuteSendingRps")
 		.repeat(300) {
 				 feed(refs)
 				.feed(refsNota)
-				.exec(http("UserPerMinuteSendingRps")
+				.exec(http("MANDAGUARI_UserPerMinuteSendingRps")
 				.post("/iss-ws/nfseService")
 				.headers(headers)
 				.body(ElFileBody("com/gatling/test/recordedsimulation/EnviarLoteRpsAssincronoEnvioVarioRPS.xml")))
 		}
 
-	setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
+	val scnPontaGrossa = scenario("PG_UserPerMinuteSendingRps")
+		.repeat(600) {
+			feed(refs)
+				.feed(refsNota)
+				.exec(http("PG_UserPerMinuteSendingRps")
+					.post("/iss-ws/nfseService")
+					.headers(headers)
+					.body(ElFileBody("com/gatling/test/recordedsimulation/EnviarPGLoteRpsAssincronoEnvioVarioRPS.xml")))
+		}
+
+	setUp(scnMandaguari.inject(atOnceUsers(5)).protocols(httpProtocolMandaguari),scnPontaGrossa.inject(atOnceUsers(2)).protocols(httpProtocolPontaGrossa))
 }
