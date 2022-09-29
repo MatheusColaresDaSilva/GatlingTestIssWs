@@ -44,7 +44,7 @@
 	   <Cnpj>47960950063808</Cnpj>
 	</CpfCnpj>
 	<InscricaoMunicipal>00019308</InscricaoMunicipal>
-	<QuantidadeRps>11</QuantidadeRps>
+	<QuantidadeRps>${numRps}</QuantidadeRps>
 	<ListaRps>
 	    <Rps>
 		  <InfDeclaracaoPrestacaoServico>

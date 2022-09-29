@@ -19,48 +19,22 @@ class SeveralRpsWithMoreThanOneInTheListOneByOneWithOneUser extends Simulation {
 	val headers = Map("Proxy-Connection" -> "Keep-Alive")
 	val r = new scala.util.Random
 
+	var numRPS = 11
 	var valor = 1000
 	private val refs = Iterator.continually({
-		  valor = valor + 1
-			Map("reference" -> valor.toString)
-		}
+		valor = valor + 1
+		Map("reference" -> valor.toString,
+			"numRps" -> numRPS.toString)
+	}
 	)
 
+	var notas = scala.Predef.Map[String, String]()
 	private val refsNota = Iterator.continually({
-		valor += 1
-		val valor1 = valor
-		valor += 1
-		val valor2 = valor
-		valor += 1
-		val valor3 = valor
-		valor += 1
-		val valor4 = valor
-		valor += 1
-		val valor5 = valor
-		valor += 1
-		val valor6 = valor
-		valor += 1
-		val valor7 = valor
-		valor += 1
-		val valor8 = valor
-		valor += 1
-		val valor9 = valor
-		valor += 1
-		val valor10 = valor
-		valor += 1
-		val valor11 = valor
-
-		Map("numnota1" -> valor1.toString,
-			"numnota2" -> valor2.toString,
-			"numnota3" -> valor3.toString,
-			"numnota4" -> valor4.toString,
-			"numnota5" -> valor5.toString,
-			"numnota6" -> valor6.toString,
-			"numnota7" -> valor7.toString,
-			"numnota8" -> valor8.toString,
-			"numnota9" -> valor9.toString,
-			"numnota10" -> valor10.toString,
-			"numnota11" -> valor11.toString)
+		for(i<-1.to(numRPS)) {
+			valor= valor+1
+			notas+= (s"numnota${i}" -> valor.toString)
+		}
+		notas
 	}
 	)
 
